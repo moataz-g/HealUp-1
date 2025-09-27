@@ -12,19 +12,102 @@ class RepasController extends Controller
 {
     public function index()
     {
-        $repas = Repas::where('user_id', Auth::id())
-                      ->orderBy('date_consommation', 'desc')
-                      ->paginate(10);
+        $repas = Repas::with(['repasIngredients', 'user'])
+            ->orderBy('date_consommation', 'desc')
+            ->paginate(10);
 
-        // CHANGÉ: nutrition.repas.index → repas.index
         return view('repas.index', compact('repas'));
+    }
+
+    public function show($id)
+    {
+        $repas = Repas::with(['repasIngredients.ingredient', 'user'])->findOrFail($id);
+        return view('repas.show', compact('repas'));
+    }
+
+    public function edit($id)
+    {
+        $repas = Repas::with(['repasIngredients.ingredient'])->findOrFail($id);
+        $ingredients = Ingredient::orderBy('nom')->get();
+        return view('repas.edit', compact('repas', 'ingredients'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $repas = Repas::findOrFail($id);
+        
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'type_repas' => 'required|in:petit-dejeuner,dejeuner,diner,collation',
+            'date_consommation' => 'required|date',
+            'ingredients' => 'required|array|min:1',
+            'ingredients.*.id' => 'required|integer|exists:ingredients,id',
+            'ingredients.*.quantite' => 'required|numeric|min:1|max:2000',
+        ]);
+
+        // Mise à jour
+        $repas->nom = $validated['nom'];
+        $repas->type_repas = $validated['type_repas'];
+        $repas->date_consommation = $validated['date_consommation'];
+
+        // Recalculs nutritionnels (même logique que store)
+        $caloriesTotal = 0;
+        $proteinesTotal = 0;
+        $glucidesTotal = 0;
+        $lipidesTotal = 0;
+
+        foreach ($validated['ingredients'] as $ingData) {
+            $ingredient = Ingredient::find($ingData['id']);
+            $facteur = $ingData['quantite'] / 100;
+            $caloriesTotal += $ingredient->calories_pour_100g * $facteur;
+            $proteinesTotal += $ingredient->proteines_pour_100g * $facteur;
+            $glucidesTotal += $ingredient->glucides_pour_100g * $facteur;
+            $lipidesTotal += $ingredient->lipides_pour_100g * $facteur;
+        }
+
+        $repas->calories_total = $caloriesTotal;
+        $repas->proteines_total = $proteinesTotal;
+        $repas->glucides_total = $glucidesTotal;
+        $repas->lipides_total = $lipidesTotal;
+        $repas->save();
+
+        // Supprimer anciennes relations et recréer
+        RepasIngredient::where('repas_id', $repas->id)->delete();
+
+        foreach ($validated['ingredients'] as $ingData) {
+            $ingredient = Ingredient::find($ingData['id']);
+            $facteur = $ingData['quantite'] / 100;
+
+            RepasIngredient::create([
+                'repas_id' => $repas->id,
+                'ingredient_id' => $ingData['id'],
+                'quantite' => $ingData['quantite'],
+                'calories_calculees' => $ingredient->calories_pour_100g * $facteur,
+                'proteines_calculees' => $ingredient->proteines_pour_100g * $facteur,
+                'glucides_calculees' => $ingredient->glucides_pour_100g * $facteur,
+                'lipides_calculees' => $ingredient->lipides_pour_100g * $facteur,
+            ]);
+        }
+
+        return redirect()->route('repas.index')->with('success', 'Repas mis à jour!');
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $repas = Repas::findOrFail($id);
+            RepasIngredient::where('repas_id', $repas->id)->delete();
+            $repas->delete();
+            
+            return redirect()->route('repas.index')->with('success', 'Repas supprimé avec succès!');
+        } catch (\Exception $e) {
+            return redirect()->route('repas.index')->with('error', 'Erreur: ' . $e->getMessage());
+        }
     }
 
     public function create()
     {
         $ingredients = Ingredient::orderBy('nom')->get();
-        
-        // CHANGÉ: nutrition.repas.create → repas.create
         return view('repas.create', compact('ingredients'));
     }
 
@@ -43,9 +126,9 @@ class RepasController extends Controller
         $repas->nom = $validated['nom'];
         $repas->type_repas = $validated['type_repas'];
         $repas->date_consommation = $validated['date_consommation'];
-        $repas->user_id = Auth::id();
+        $repas->user_id = Auth::id() ?? 1;
 
-        // Calculs nutritionnels...
+        // Calculs nutritionnels
         $caloriesTotal = 0;
         $proteinesTotal = 0;
         $glucidesTotal = 0;
@@ -54,7 +137,6 @@ class RepasController extends Controller
         foreach ($validated['ingredients'] as $ingData) {
             $ingredient = Ingredient::find($ingData['id']);
             $facteur = $ingData['quantite'] / 100;
-
             $caloriesTotal += $ingredient->calories_pour_100g * $facteur;
             $proteinesTotal += $ingredient->proteines_pour_100g * $facteur;
             $glucidesTotal += $ingredient->glucides_pour_100g * $facteur;
@@ -65,49 +147,24 @@ class RepasController extends Controller
         $repas->proteines_total = $proteinesTotal;
         $repas->glucides_total = $glucidesTotal;
         $repas->lipides_total = $lipidesTotal;
-        
         $repas->save();
 
-        // Associer les ingrédients
+        // Créer les relations
         foreach ($validated['ingredients'] as $ingData) {
             $ingredient = Ingredient::find($ingData['id']);
             $facteur = $ingData['quantite'] / 100;
-            $calories = $ingredient->calories_pour_100g * $facteur;
 
             RepasIngredient::create([
                 'repas_id' => $repas->id,
                 'ingredient_id' => $ingData['id'],
                 'quantite' => $ingData['quantite'],
-                'calories_calculees' => $calories
+                'calories_calculees' => $ingredient->calories_pour_100g * $facteur,
+                'proteines_calculees' => $ingredient->proteines_pour_100g * $facteur,
+                'glucides_calculees' => $ingredient->glucides_pour_100g * $facteur,
+                'lipides_calculees' => $ingredient->lipides_pour_100g * $facteur,
             ]);
         }
 
-        return redirect()->route('repas.index')->with('success', 'Repas créé avec succès!');
-    }
-
-    public function show(Repas $repas)
-    {
-        // CHANGÉ: nutrition.repas.show → repas.show
-        return view('repas.show', compact('repas'));
-    }
-
-    public function edit(Repas $repas)
-    {
-        $ingredients = Ingredient::orderBy('nom')->get();
-        
-        // CHANGÉ: nutrition.repas.edit → repas.edit  
-        return view('repas.edit', compact('repas', 'ingredients'));
-    }
-
-    public function update(Request $request, Repas $repas)
-    {
-        // Logique de mise à jour similaire à store()...
-        return redirect()->route('repas.index')->with('success', 'Repas mis à jour avec succès!');
-    }
-
-    public function destroy(Repas $repas)
-    {
-        $repas->delete();
-        return redirect()->route('repas.index')->with('success', 'Repas supprimé avec succès!');
+        return redirect()->route('repas.index')->with('success', 'Repas créé!');
     }
 }

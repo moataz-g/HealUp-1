@@ -1,144 +1,111 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto py-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-blue-700">
-            @if($repas->type_repas == 'petit-dejeuner') 🌅
-            @elseif($repas->type_repas == 'dejeuner') ☀️
-            @elseif($repas->type_repas == 'diner') 🌙
-            @else 🍴
-            @endif
-            {{ $repas->nom }}
-        </h1>
-        <div class="flex space-x-2">
-            <a href="{{ route('repas.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded">Retour</a>
-            <a href="{{ route('repas.edit', $repas) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded">✏️ Modifier</a>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Informations générales -->
-        <div class="lg:col-span-1">
-            <div class="bg-white shadow rounded-lg p-6 mb-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">📋 Informations</h3>
-                
-                <div class="space-y-4">
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                <div class="flex justify-between items-center">
                     <div>
-                        <label class="block text-sm font-medium text-gray-600">Type de repas</label>
-                        <p class="text-lg capitalize">
+                        <h1 class="text-2xl font-bold">{{ $repas->nom ?? 'Repas sans nom' }}</h1>
+                        <p class="text-blue-100 mt-1">
                             @if($repas->type_repas == 'petit-dejeuner') 🌅 Petit-déjeuner
                             @elseif($repas->type_repas == 'dejeuner') ☀️ Déjeuner
                             @elseif($repas->type_repas == 'diner') 🌙 Dîner
-                            @else 🍴 {{ str_replace('-', ' ', $repas->type_repas) }}
+                            @else 🍴 {{ str_replace('-', ' ', $repas->type_repas ?? 'Inconnu') }}
                             @endif
                         </p>
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Date de consommation</label>
-                        <p class="text-lg">{{ $repas->date_consommation->format('d/m/Y à H:i') }}</p>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Créé par</label>
-                        <p class="text-lg">{{ $repas->user->name }}</p>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Ajouté</label>
-                        <p class="text-sm text-gray-500">{{ $repas->created_at->format('d/m/Y à H:i') }}</p>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold">{{ round($repas->calories_total ?? 0) }}</div>
+                        <div class="text-sm text-blue-100">kcal</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Valeurs nutritionnelles -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">📊 Valeurs nutritionnelles</h3>
-                
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center p-3 bg-blue-50 rounded">
-                        <span class="font-medium">Calories</span>
-                        <span class="text-xl font-bold text-blue-600">{{ round($repas->calories_total) }} kcal</span>
+            <!-- Informations générales -->
+            <div class="px-6 py-4 bg-gray-50 border-b">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600">Date de consommation:</span>
+                        <div class="font-medium">
+                            {{ $repas->date_consommation ? $repas->date_consommation->format('d/m/Y à H:i') : 'Non définie' }}
+                        </div>
                     </div>
-                    
-                    <div class="flex justify-between items-center p-3 bg-red-50 rounded">
-                        <span class="font-medium">Protéines</span>
-                        <span class="text-xl font-bold text-red-600">{{ round($repas->proteines_total, 1) }}g</span>
+                    <div>
+                        <span class="text-gray-600">Créé par:</span>
+                        <div class="font-medium">{{ $repas->user->name ?? 'Utilisateur inconnu' }}</div>
                     </div>
-                    
-                    <div class="flex justify-between items-center p-3 bg-yellow-50 rounded">
-                        <span class="font-medium">Glucides</span>
-                        <span class="text-xl font-bold text-yellow-600">{{ round($repas->glucides_total, 1) }}g</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center p-3 bg-purple-50 rounded">
-                        <span class="font-medium">Lipides</span>
-                        <span class="text-xl font-bold text-purple-600">{{ round($repas->lipides_total, 1) }}g</span>
+                    <div>
+                        <span class="text-gray-600">Créé le:</span>
+                        <div class="font-medium">
+                            {{ $repas->created_at ? $repas->created_at->format('d/m/Y à H:i') : 'Date inconnue' }}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Liste des ingrédients -->
-        <div class="lg:col-span-2">
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">🥕 Ingrédients ({{ $repas->ingredients->count() }})</h3>
+            <!-- Informations nutritionnelles -->
+            <div class="px-6 py-4 border-b">
+                <h3 class="text-lg font-semibold mb-4">Informations Nutritionnelles</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-red-50 p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-red-600">{{ round($repas->calories_total ?? 0) }}</div>
+                        <div class="text-sm text-red-500">Calories (kcal)</div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-blue-600">{{ round($repas->proteines_total ?? 0) }}g</div>
+                        <div class="text-sm text-blue-500">Protéines</div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-green-600">{{ round($repas->glucides_total ?? 0) }}g</div>
+                        <div class="text-sm text-green-500">Glucides</div>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-yellow-600">{{ round($repas->lipides_total ?? 0) }}g</div>
+                        <div class="text-sm text-yellow-500">Lipides</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des ingrédients -->
+            <div class="px-6 py-4">
+                <h3 class="text-lg font-semibold mb-4">Ingrédients ({{ $repas->repasIngredients->count() }})</h3>
                 
-                @if($repas->ingredients->count() > 0)
-                    <div class="space-y-4">
-                        @foreach($repas->ingredients as $ingredient)
-                            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h4 class="text-lg font-semibold text-gray-800">
-                                            @if($ingredient->categorie == 'fruits') 🍎
-                                            @elseif($ingredient->categorie == 'legumes') 🥕
-                                            @elseif($ingredient->categorie == 'cereales') 🌾
-                                            @elseif($ingredient->categorie == 'viandes') 🥩
-                                            @elseif($ingredient->categorie == 'poissons') 🐟
-                                            @elseif($ingredient->categorie == 'laitiers') 🥛
-                                            @else 📦
-                                            @endif
-                                            {{ $ingredient->nom }}
-                                        </h4>
-                                        <p class="text-sm text-gray-600 capitalize">{{ $ingredient->categorie }}</p>
+                @if($repas->repasIngredients && $repas->repasIngredients->count() > 0)
+                    <div class="space-y-3">
+                        @foreach($repas->repasIngredients as $repasIngredient)
+                            @php
+                                $ingredient = $repasIngredient->ingredient;
+                                $quantite = $repasIngredient->quantite;
+                            @endphp
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="flex items-center">
+                                        <h4 class="font-medium text-gray-900">{{ $ingredient->nom ?? 'Ingrédient inconnu' }}</h4>
+                                        <span class="ml-2 px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
+                                            {{ $ingredient->categorie ?? 'Non catégorisé' }}
+                                        </span>
                                     </div>
-                                    <div class="text-right">
-                                        <p class="text-lg font-semibold text-blue-600">Quantité: <strong>{{ $ingredient->pivot->quantite ?? 0 }}g</strong></p>
-                                        <p class="text-sm text-gray-500">{{ round($ingredient->pivot->calories_calculees ?? 0) }} kcal</p>
+                                    <div class="mt-1 text-sm text-gray-600">
+                                        Quantité: <span class="font-medium">{{ $quantite ?? 0 }}g</span>
                                     </div>
-                                </div>
-                                
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 pt-3 border-t border-gray-100">
-                                    <div class="text-center">
-                                        <div class="text-sm font-bold text-blue-600">{{ round(($ingredient->calories_pour_100g * ($ingredient->pivot->quantite ?? 0)) / 100) }}</div>
-                                        <div class="text-xs text-gray-500">kcal</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-sm font-bold text-red-600">{{ round(($ingredient->proteines_pour_100g * ($ingredient->pivot->quantite ?? 0)) / 100, 1) }}g</div>
-                                        <div class="text-xs text-gray-500">protéines</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-sm font-bold text-yellow-600">{{ round(($ingredient->glucides_pour_100g * ($ingredient->pivot->quantite ?? 0)) / 100, 1) }}g</div>
-                                        <div class="text-xs text-gray-500">glucides</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-sm font-bold text-purple-600">{{ round(($ingredient->lipides_pour_100g * ($ingredient->pivot->quantite ?? 0)) / 100, 1) }}g</div>
-                                        <div class="text-xs text-gray-500">lipides</div>
-                                    </div>
-                                </div>
-                                
-                                @if($ingredient->allergenes)
-                                    <div class="mt-3 pt-3 border-t border-gray-100">
-                                        <p class="text-sm text-gray-600 mb-1">⚠️ Allergènes:</p>
-                                        <div class="flex flex-wrap gap-1">
-                                            @foreach(explode(',', $ingredient->allergenes) as $allergene)
-                                                <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">{{ trim($allergene) }}</span>
-                                            @endforeach
+                                    @if($ingredient->allergenes)
+                                        <div class="mt-1 text-xs text-orange-600">
+                                            ⚠️ Allergènes: {{ $ingredient->allergenes }}
                                         </div>
+                                    @endif
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-bold text-gray-900">
+                                        {{ round($repasIngredient->calories_calculees ?? 0) }} kcal
                                     </div>
-                                @endif
+                                    <div class="text-xs text-gray-500">
+                                        P: {{ round($repasIngredient->proteines_calculees ?? 0) }}g | 
+                                        G: {{ round($repasIngredient->glucides_calculees ?? 0) }}g | 
+                                        L: {{ round($repasIngredient->lipides_calculees ?? 0) }}g
+                                    </div>
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -150,23 +117,28 @@
                 @endif
             </div>
         </div>
-    </div>
 
-    <!-- Actions -->
-    <div class="mt-8 flex justify-center space-x-4">
-        <a href="{{ route('repas.edit', $repas) }}" 
-           class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 rounded">
-            ✏️ Modifier ce repas
-        </a>
-        <form action="{{ route('repas.destroy', $repas) }}" method="POST" class="inline" 
-              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce repas ?')">
-            @csrf
-            @method('DELETE')
-            <button type="submit" 
-                    class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded">
-                🗑️ Supprimer
-            </button>
-        </form>
+        <!-- Actions -->
+        <div class="mt-6 flex flex-wrap gap-4">
+            <a href="{{ route('repas.edit', $repas->id) }}" 
+               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Modifier ce repas
+            </a>
+            
+            <form action="{{ route('repas.destroy', $repas->id) }}" method="POST" class="inline" 
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce repas ?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    Supprimer
+                </button>
+            </form>
+            
+            <a href="{{ route('repas.index') }}" 
+               class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                Retour à la liste
+            </a>
+        </div>
     </div>
 </div>
 @endsection
