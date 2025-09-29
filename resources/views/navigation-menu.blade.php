@@ -79,13 +79,13 @@
                         </div>
                     </div>
 
-                    <!-- Events Link -->
-                    <x-nav-link href="{{ route('events.index') }}" :active="request()->routeIs('events.*')"
+                    <!-- Wellness Events (Front Office) Link -->
+                    <x-nav-link href="{{ route('events.frontoffice') }}" :active="request()->routeIs('events.frontoffice')"
                                 class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V8a1 1 0 011-1h4z"></path>
                         </svg>
-                        {{ __('Events') }}
+                        {{ __('Wellness Events') }}
                     </x-nav-link>
                     <!-- Categories Link -->
                     <x-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('categories.*')"
@@ -309,9 +309,9 @@
                 </x-responsive-nav-link>
             </div>
 
-            <!-- Events Navigation -->
-            <x-responsive-nav-link href="{{ route('events.index') }}" :active="request()->routeIs('events.*')">
-                {{ __('Events') }}
+            <!-- Wellness Events (Front Office) Navigation -->
+            <x-responsive-nav-link href="{{ route('events.frontoffice') }}" :active="request()->routeIs('events.frontoffice')">
+                {{ __('Wellness Events') }}
             </x-responsive-nav-link>
             <!-- Categories Navigation -->
             <x-responsive-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('categories.*')">

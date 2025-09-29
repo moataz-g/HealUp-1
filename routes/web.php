@@ -1,4 +1,8 @@
+
 <?php
+
+// Professor: View event participants
+Route::get('/events/{event}/participants', [App\Http\Controllers\EventController::class, 'participants'])->name('events.participants');
 
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\EventController;
@@ -64,6 +68,14 @@ Route::middleware([
     Route::get('/health/reports/habit-comparison', [App\Http\Controllers\HealthReportController::class, 'habitComparison'])->name('health.reports.habit-comparison');
     Route::get('/health/reports/export-pdf', [App\Http\Controllers\HealthReportController::class, 'exportPdf'])->name('health.reports.export-pdf');
 
+
+
+
+    // Front office wellness events page
+    Route::get('/wellness-events', [EventController::class, 'frontoffice'])->name('events.frontoffice');
+
+    // Event registration (student)
+    Route::post('/events/{event}/register', [EventController::class, 'register'])->name('events.register');
 
     // Wellness Events resource routes
     Route::resource('events', EventController::class);
