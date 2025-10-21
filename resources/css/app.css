@@ -1,3 +1,6 @@
+/* Import Floating Chat Styles */
+@import './floating-chat.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

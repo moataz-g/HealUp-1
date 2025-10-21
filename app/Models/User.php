@@ -144,6 +144,40 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Event::class);
     }
 
+    // ===== RELATIONS CHAT =====
+    public function conversations()
+    {
+        return Conversation::where('user_one_id', $this->id)
+            ->orWhere('user_two_id', $this->id);
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(ConversationMessage::class, 'sender_id');
+    }
+
+    public function typingIndicators()
+    {
+        return $this->hasMany(TypingIndicator::class);
+    }
+
+    /**
+     * Get online status (can be extended with presence tracking)
+     */
+    public function isOnline()
+    {
+        // This can be extended with a real-time presence system
+        return cache()->has('user-is-online-' . $this->id);
+    }
+
+    /**
+     * Set user online status
+     */
+    public function setOnline()
+    {
+        cache()->put('user-is-online-' . $this->id, true, now()->addMinutes(5));
+    }
+
     // ===== RELATIONS NUTRITION =====
     public function repas()
     {

@@ -96,6 +96,22 @@
 
     <!-- Additional Head Content -->
     @stack('head')
+    
+    <!-- User Data for JavaScript (for authenticated users) -->
+    @auth
+    <script>
+        window.Laravel = {
+            csrfToken: '{{ csrf_token() }}',
+            user: {
+                id: {{ auth()->id() }},
+                name: '{{ auth()->user()->name }}',
+                email: '{{ auth()->user()->email }}',
+                avatar: '{{ auth()->user()->profile_photo_url }}',
+                role: '{{ auth()->user()->role }}'
+            }
+        };
+    </script>
+    @endauth
 </head>
 
 <body

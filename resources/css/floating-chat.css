@@ -1,0 +1,387 @@
+/* Floating Chat System Styles */
+
+/* Chat Button */
+#floating-chat-button {
+    box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+    z-index: 9999 !important; /* Ensure it's always on top */
+    animation: buttonPulse 2s ease-in-out infinite;
+}
+
+#floating-chat-button:hover {
+    box-shadow: 0 15px 30px rgba(34, 197, 94, 0.4);
+}
+
+/* Add a subtle pulse to make it more noticeable */
+@keyframes buttonPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 15px 35px rgba(34, 197, 94, 0.5);
+    }
+}
+
+/* Chat Sidebar */
+#floating-chat-sidebar {
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+}
+
+#floating-chat-sidebar.translate-y-full {
+    transform: translateY(100%);
+}
+
+/* Chat Search Results */
+#chat-search-results {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Conversation Item Hover Effect */
+.conversation-item {
+    transition: all 0.2s ease;
+}
+
+.conversation-item:hover {
+    transform: translateX(-2px);
+}
+
+/* Chat Window */
+.chat-window {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.chat-window.minimized {
+    height: 45px !important;
+}
+
+.chat-window.minimized .chat-window-body,
+.chat-window.minimized .chat-window-footer {
+    display: none;
+}
+
+/* Chat Window Header */
+.chat-window-header {
+    user-select: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Messages Container */
+.chat-window-body {
+    background-image: radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.03) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
+}
+
+.chat-window-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-window-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-window-body::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.chat-window-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Dark mode scrollbar */
+.dark .chat-window-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.dark .chat-window-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Message Bubbles */
+.chat-window-body > div:first-child {
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typing Animation */
+.animate-bounce {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Message Input */
+.chat-window-footer textarea {
+    transition: all 0.2s ease;
+}
+
+.chat-window-footer textarea:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+/* Resize Handle */
+.resize-handle {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.chat-window:hover .resize-handle {
+    opacity: 1;
+    background: linear-gradient(to bottom, rgba(34, 197, 94, 0.1), transparent);
+}
+
+/* Online Status Indicator Pulse */
+.chat-window-header img + span {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Notification Badge Pulse */
+#chat-badge {
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Search Results Animation */
+#chat-search-results > div {
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Message Read Receipt */
+.chat-window-body svg[class*="text-green"] {
+    animation: checkMark 0.3s ease;
+}
+
+@keyframes checkMark {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    #floating-chat-button {
+        bottom: 1rem;
+        right: 1rem;
+    }
+    
+    #floating-chat-sidebar {
+        width: 100%;
+        right: 0;
+        left: 0;
+        max-width: 100%;
+    }
+    
+    .chat-window {
+        width: calc(100% - 2rem) !important;
+        left: 1rem !important;
+        right: 1rem !important;
+    }
+}
+
+/* Hover effects for buttons */
+.chat-window-header button:hover,
+.chat-window-footer button:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* Focus states for accessibility */
+.chat-window-footer textarea:focus,
+#chat-user-search:focus {
+    outline: none;
+}
+
+/* Loading spinner */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Smooth transitions for theme switching */
+.chat-window,
+.chat-window-body,
+.chat-window-footer,
+#floating-chat-sidebar,
+.conversation-item {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Message bubble hover effect */
+.chat-window-body .relative:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease;
+}
+
+/* Unread badge animation */
+.conversation-item span[class*="bg-green-600"] {
+    animation: fadeInScale 0.3s ease;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Role badge styles */
+.conversation-item span[class*="rounded-full"] {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Dragging cursor */
+.chat-window-header.dragging {
+    cursor: grabbing !important;
+}
+
+/* Z-index management */
+.chat-window:focus-within {
+    z-index: 31;
+}
+
+/* Textarea auto-expand */
+.chat-window-footer textarea {
+    min-height: 40px;
+    line-height: 1.5;
+}
+
+/* Empty state icons */
+.chat-window-body svg[class*="w-12"],
+#chat-conversations-list svg[class*="w-16"] {
+    opacity: 0.5;
+}
+
+/* Smooth scroll behavior */
+.chat-window-body,
+#chat-conversations-list,
+#chat-search-results {
+    scroll-behavior: smooth;
+}
+
+/* Loading state */
+.chat-window-body .animate-spin {
+    border-color: rgba(34, 197, 94, 0.2);
+    border-top-color: rgb(34, 197, 94);
+}
+
+/* Gradient backgrounds for headers */
+.bg-gradient-to-r {
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Message timestamp fade in */
+.chat-window-body span[class*="text-xs"] {
+    animation: fadeIn 0.5s ease 0.2s both;
+}
+
+/* Prevent text selection on draggable elements */
+.chat-window-header {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .chat-window {
+        border: 2px solid currentColor;
+    }
+    
+    #floating-chat-button {
+        border: 2px solid white;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    #floating-chat-button,
+    #floating-chat-sidebar,
+    .chat-window {
+        display: none !important;
+    }
+}

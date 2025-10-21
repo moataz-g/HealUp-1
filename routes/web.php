@@ -34,6 +34,11 @@ Route::get('/debug', function () {
     return view('debug');
 })->name('debug');
 
+// Chat system test route (remove in production)
+Route::get('/chat-test', function () {
+    return view('chat-test');
+})->name('chat-test')->middleware('auth');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -102,9 +107,34 @@ Route::middleware([
     Route::get('/chat-sessions/{id}', [ChatSessionController::class, 'show'])->name('chat.sessions.show');
     Route::delete('/chat-sessions/{id}', [ChatSessionController::class, 'destroy'])->name('chat.sessions.destroy');
 
-
     // Chat messages
     Route::post('/chat-sessions/{id}/messages', [ChatMessageController::class, 'store'])->name('chat.messages.store');
+
+    // ===== FLOATING CHAT SYSTEM ROUTES =====
+    Route::prefix('chat')->name('chat.')->group(function () {
+        // Conversations
+        Route::get('/conversations', [App\Http\Controllers\ChatController::class, 'getConversations'])->name('conversations');
+        Route::post('/conversations/start', [App\Http\Controllers\ChatController::class, 'startConversation'])->name('conversations.start');
+        Route::delete('/conversations/{conversationId}', [App\Http\Controllers\ChatController::class, 'deleteConversation'])->name('conversations.delete');
+        
+        // Messages
+        Route::get('/conversations/{conversationId}/messages', [App\Http\Controllers\ChatController::class, 'getMessages'])->name('messages');
+        Route::post('/conversations/{conversationId}/messages', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('messages.send');
+        Route::post('/conversations/{conversationId}/mark-read', [App\Http\Controllers\ChatController::class, 'markAsRead'])->name('messages.mark-read');
+        
+        // Typing indicators
+        Route::post('/conversations/{conversationId}/typing', [App\Http\Controllers\ChatController::class, 'updateTyping'])->name('typing.update');
+        Route::get('/conversations/{conversationId}/typing', [App\Http\Controllers\ChatController::class, 'getTypingStatus'])->name('typing.status');
+        
+        // User search
+        Route::get('/users/search', [App\Http\Controllers\ChatController::class, 'searchUsers'])->name('users.search');
+        
+        // Online status
+        Route::post('/online', [App\Http\Controllers\ChatController::class, 'setOnline'])->name('online');
+        
+        // Unread count
+        Route::get('/unread-count', [App\Http\Controllers\ChatController::class, 'getUnreadCount'])->name('unread-count');
+    });
 });
 
 // Admin Routes - Protected by auth and admin middleware
