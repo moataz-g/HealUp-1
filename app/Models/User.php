@@ -17,6 +17,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
     use HasProfilePhoto;
+    use \Laravel\Jetstream\HasTeams;
     use Notifiable;
     use TwoFactorAuthenticatable;
 
