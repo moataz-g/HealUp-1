@@ -11,12 +11,12 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('ingredients', function (Blueprint $table) {
-            $table->string('nom')->after('id');
-            $table->string('categorie', 100)->after('nom');
-            $table->decimal('calories_pour_100g', 8, 2)->after('categorie');
-            $table->decimal('proteines_pour_100g', 8, 2)->after('calories_pour_100g');
-            $table->decimal('glucides_pour_100g', 8, 2)->after('proteines_pour_100g');
-            $table->decimal('lipides_pour_100g', 8, 2)->after('glucides_pour_100g');
+            $table->string('nom')->nullable()->after('id');
+            $table->string('categorie', 100)->nullable()->after('nom');
+            $table->decimal('calories_pour_100g', 8, 2)->nullable()->after('categorie');
+            $table->decimal('proteines_pour_100g', 8, 2)->nullable()->after('calories_pour_100g');
+            $table->decimal('glucides_pour_100g', 8, 2)->nullable()->after('proteines_pour_100g');
+            $table->decimal('lipides_pour_100g', 8, 2)->nullable()->after('glucides_pour_100g');
             $table->decimal('fibres_pour_100g', 8, 2)->nullable()->after('lipides_pour_100g');
             $table->json('allergenes')->nullable()->after('fibres_pour_100g');
             $table->string('image')->nullable()->after('allergenes');

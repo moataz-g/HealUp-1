@@ -19,6 +19,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->app->bind(
+            \Laravel\Jetstream\Contracts\CreatesTeams::class,
+            \App\Actions\Jetstream\CreateTeam::class
+        );
+        $this->app->bind(
+            \Laravel\Jetstream\Contracts\DeletesTeams::class,
+            \App\Actions\Jetstream\DeleteTeam::class
+        );
+        // Add other Jetstream actions as needed
     }
 }

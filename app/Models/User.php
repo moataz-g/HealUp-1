@@ -57,6 +57,17 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo_url',
     ];
 
+    // Jetstream Team Relationships
+    public function ownedTeams()
+    {
+        return $this->hasMany(Team::class, 'user_id');
+    }
+
+    public function currentTeam()
+    {
+        return $this->belongsTo(Team::class, 'current_team_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -114,9 +125,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Participation::class);
     }
 
-    public function createdChallenges(): HasMany
+    public function createdChallenges()
     {
-    return $this->hasMany(Challenge::class, 'created_by');
+        return $this->hasMany(Challenge::class, 'created_by');
     }
 
     public function posts()
