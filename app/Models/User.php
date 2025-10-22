@@ -66,7 +66,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function currentTeam()
     {
-        return $this->belongsTo(Team::class, 'current_team_id');
+        // Always return the personal team if current_team_id is null
+        $team = $this->belongsTo(Team::class, 'current_team_id')->getResults();
+        if ($team) {
+            return $team;
+        }
+        // Fallback: return the first owned team (usually personal team)
+        return $this->ownedTeams()->where('personal_team', true)->first();
     }
 
     /**

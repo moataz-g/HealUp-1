@@ -20,11 +20,11 @@ class RepasController extends Controller
         // 🔍 Recherche par nom
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nom', 'like', "%{$search}%")
-                  ->orWhereHas('repasIngredients.ingredient', function($q) use ($search) {
-                      $q->where('nom', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('repasIngredients.ingredient', function ($q) use ($search) {
+                        $q->where('nom', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -57,14 +57,14 @@ class RepasController extends Controller
         // 📊 Tri dynamique
         $sortField = $request->get('sort', 'date_consommation');
         $sortDirection = $request->get('direction', 'desc');
-        
+
         $allowedSorts = ['nom', 'date_consommation', 'calories_total', 'proteines_total', 'glucides_total', 'lipides_total', 'type_repas'];
         if (in_array($sortField, $allowedSorts)) {
             $query->orderBy($sortField, $sortDirection);
         }
 
         $repas = $query->paginate(10)->withQueryString();
-        
+
         // Données pour les filtres
         $typesRepas = ['petit-dejeuner', 'dejeuner', 'diner', 'collation'];
 
@@ -228,7 +228,7 @@ class RepasController extends Controller
     public function aiSuggestions(Request $request, AIRepasService $aiService)
     {
         $user = Auth::user();
-        
+
         $preferences = [
             'objectif_calories' => $request->input('objectif_calories', 2000),
             'objectif_proteines' => $request->input('objectif_proteines', 100),
@@ -297,9 +297,9 @@ class RepasController extends Controller
     public function predictGoals(Request $request, AIAnalysisService $analysisService)
     {
         $user = Auth::user();
-        
+
         $goals = $request->validate([
-            'calories' => 'nullable|numeric',
+            'calories' => 'nullable|numeric|min:0',
             'proteines' => 'nullable|numeric',
             'glucides' => 'nullable|numeric',
             'lipides' => 'nullable|numeric'
@@ -319,7 +319,7 @@ class RepasController extends Controller
     public function optimizeRepas(Request $request, $id, AIRepasService $aiService)
     {
         $repas = Repas::with('repasIngredients.ingredient')->findOrFail($id);
-        
+
         $targets = $request->validate([
             'calories' => 'nullable|numeric',
             'proteines' => 'nullable|numeric',
@@ -341,7 +341,7 @@ class RepasController extends Controller
     public function weeklyPlan(Request $request, AIRepasService $aiService)
     {
         $user = Auth::user();
-        
+
         $preferences = [
             'objectif_calories' => $request->input('objectif_calories', 2000),
             'nombre_repas' => $request->input('nombre_repas', 3),
@@ -362,7 +362,7 @@ class RepasController extends Controller
     public function analyzeMealQuality($id, AIAnalysisService $analysisService)
     {
         $repas = Repas::with('repasIngredients.ingredient')->findOrFail($id);
-        
+
         $quality = $analysisService->analyzeMealQuality($repas);
 
         return response()->json([
